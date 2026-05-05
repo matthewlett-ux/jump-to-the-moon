@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jump to the Moon</title>
+    <style>
+        :root {
+            --bg-color: #050510;       
+            --panel-bg: #0a0f1e;       
+            --text-main: #ffffff;      
+            --border-heavy: #ffffff;   
+            --shadow-color: #2a3454;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: "Arial Black", "Impact", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-transform: uppercase;
+            overflow: hidden; 
+            
+            background-image: radial-gradient(#2a3454 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-position: 0 0;
+        }
+
+        .page-title {
+            font-size: 56px;
+            font-weight: 900;
+            color: #ffcc00; 
+            text-shadow: 4px 4px 0px #ff3366, 8px 8px 0px #000;
+            margin: 0 0 20px 0;
+            text-align: center;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 10;
+            -webkit-text-stroke: 2px #000; 
+        }
+
+        .decor-planets {
+            position: fixed;
+            top: -20px;
+            right: 20px;
+            width: 350px;
+            z-index: 0;
+            animation: float-slow 12s ease-in-out infinite;
+            pointer-events: none; 
+        }
+
+        .decor-rocket {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 320px;
+            z-index: 0;
+            animation: float-fast 7s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-slow {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(20px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes float-fast {
+            0% { transform: translateY(0px) rotate(-5deg); }
+            50% { transform: translateY(-15px) rotate(0deg); }
+            100% { transform: translateY(0px) rotate(-5deg); }
+        }
+
+        .dashboard {
+            width: 850px;
+            background: var(--panel-bg);
+            border-radius: 16px;
+            padding: 30px 40px;
+            border: 4px solid var(--border-heavy);
+            box-shadow: 16px 16px 0px #00e5ff; 
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            position: relative;
+            z-index: 10; 
+        }
+
+        .hud {
+            text-align: center;
+            background: #000;
+            border-radius: 12px;
+            padding: 25px;
+            border: 4px solid var(--border-heavy);
+            box-shadow: inset 6px 6px 0px #1a1f33;
+            transition: all 0.2s ease;
+        }
+        
+        .hud-subtitle {
+            font-size: 18px;
+            color: #00e5ff; 
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+        
+        .hud-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-shadow: 4px 4px 0px #ff3366;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 24px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 20px;
+            border: 3px solid var(--border-heavy);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #00e5ff; 
+            transition: width 0.1s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-right: 3px solid var(--border-heavy);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-family: inherit;
+            font-weight: 900;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-transform: uppercase;
+        }
+
+        /* --- NEW WEB SERIAL CONNECT BUTTON --- */
+        .btn-connect {
+            background: #ffcc00;
+            color: #000;
+            border: 3px solid var(--border-heavy);
+            box-shadow: 6px 6px 0px #000;
+            animation: pulse 2s infinite;
+        }
+
+        .btn-connect:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px #000;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 6px 6px 0px #000, 0 0 0px #ffcc00; }
+            50% { box-shadow: 6px 6px 0px #000, 0 0 20px #ffcc00; }
+            100% { box-shadow: 6px 6px 0px #000, 0 0 0px #ffcc00; }
+        }
+        /* ----------------------------------- */
+
+        .btn-start {
+            background: #00e5ff;
+            color: #000;
+            border: 3px solid var(--border-heavy);
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px #000;
+        }
+        
+        .btn-start:active:not(:disabled) {
+            transform: translate(6px, 6px);
+            box-shadow: 0px 0px 0px #000;
+        }
+
+        .btn-start:disabled {
+            background: #2a3454;
+            color: #8b9bb4;
+            border-color: #2a3454;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: #ff3366;
+            color: #fff;
+            border: 3px solid var(--border-heavy);
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .btn-reset:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px #000;
+        }
+        
+        .btn-reset:active {
+            transform: translate(6px, 6px);
+            box-shadow: 0px 0px 0px #000;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 3px solid #2a3454;
+            border-radius: 8px;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 14px;
+            color: #8b9bb4;
+            transition: all 0.1s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            --theme-color: #fff; 
+            box-shadow: 6px 6px 0px #2a3454;
+        }
+
+        .panel-id {
+            font-size: 24px;
+            color: var(--theme-color);
+            opacity: 0.5;
+        }
+
+        .panel.target {
+            border-color: var(--theme-color);
+            color: #fff;
+            background: #111a33;
+            box-shadow: 6px 6px 0px var(--theme-color);
+        }
+        .panel.target .panel-id {
+            opacity: 1;
+        }
+
+        .panel.hit {
+            background: var(--theme-color);
+            color: #000;
+            transform: translate(6px, 6px);
+            box-shadow: 0px 0px 0px var(--theme-color);
+        }
+        .panel.hit .panel-id {
+            color: #000;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0px;
+            font-size: 14px;
+            color: var(--border-heavy);
+            letter-spacing: 1px;
+            font-weight: 900;
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background: #ff3366; 
+            margin-right: 10px;
+            border: 2px solid var(--border-heavy);
+        }
+    </style>
+</head>
+<body>
+
+    <img src="assets/planets.png" class="decor-planets" alt="Space Planets">
+    <img src="assets/rocket.png" class="decor-rocket" alt="Astronaut on Rocket">
+
+    <h1 class="page-title">JUMP TO THE MOON</h1>
+
+    <div class="dashboard">
+        <div class="hud" id="hud">
+            <div class="hud-subtitle" id="hud-sub">MISSION TELEMETRY: OFFLINE</div>
+            <div class="hud-title" id="hud-main">AWAITING CONNECTION</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="prog-bar"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <!-- NEW CONNECT BUTTON -->
+            <button class="btn btn-connect" id="btn-connect">CONNECT HARDWARE</button>
+            <button class="btn btn-start" id="btn-start" style="display:none;" disabled>INITIATE LAUNCH</button>
+            <button class="btn btn-reset" id="btn-reset">ABORT</button>
+        </div>
+
+        <div class="grid" id="panel-grid"></div>
+
+        <div class="footer">
+            <div><span class="status-dot" id="conn-dot"></span><span id="conn-text">MICRO:BIT COMMS: DISCONNECTED</span></div>
+            <div>ASTRONAUT FITNESS AI V2.0</div>
+        </div>
+    </div>
+
+    <script>
+        const ACTIVITIES = [
+            { id: "1", name: "Star Jumps",       color: "#ffcc00", hitsNeeded: 10 }, 
+            { id: "2", name: "Rocket Sprints",   color: "#33ff77", hitsNeeded: 20 }, 
+            { id: "3", name: "Lunar Jogs",       color: "#00e5ff", hitsNeeded: 15 }, 
+            { id: "4", name: "Anti-Grav Push",   color: "#3b82f6", hitsNeeded: 8 },  
+            { id: "5", name: "Solar Sit Ups",    color: "#ff9900", hitsNeeded: 8 },  
+            { id: "6", name: "Cryo-Rest",        color: "#9933ff", hitsNeeded: 5 },  
+            { id: "7", name: "Asteroid Squats",  color: "#ff3366", hitsNeeded: 10 }, 
+            { id: "8", name: "Launchpad Lunges", color: "#f8fafc", hitsNeeded: 10 }  
+        ];
+
+        const grid = document.getElementById('panel-grid');
+        const hudMain = document.getElementById('hud-main');
+        const hudSub = document.getElementById('hud-sub');
+        const progBar = document.getElementById('prog-bar');
+        const hudBox = document.getElementById('hud');
+        
+        const btnConnect = document.getElementById('btn-connect');
+        const btnStart = document.getElementById('btn-start');
+        const btnReset = document.getElementById('btn-reset');
+        
+        const connDot = document.getElementById('conn-dot');
+        const connText = document.getElementById('conn-text');
+
+        const panels = {};
+        let currentTarget = null;
+        let currentHits = 0;
+        let isTransitioning = false; 
+        
+        let circuitDeck = [];
+        const totalExercises = ACTIVITIES.length;
+
+        ACTIVITIES.forEach(act => {
+            const div = document.createElement('div');
+            div.className = 'panel';
+            div.style.setProperty('--theme-color', act.color); 
+            div.innerHTML = `<div class="panel-id">CH ${act.id}</div><div>${act.name}</div>`;
+            grid.appendChild(div);
+            panels[act.id] = div;
+        });
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function unlockAudio() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playBeep(isSuccess) {
+            if (audioCtx.state === 'suspended') return;
+            const now = audioCtx.currentTime;
+            
+            if (isSuccess) {
+                const notes = [440, 554.37, 659.25, 880]; 
+                notes.forEach((freq, index) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'square'; 
+                    osc.frequency.value = freq;
+                    
+                    const subOsc = audioCtx.createOscillator();
+                    subOsc.connect(gain);
+                    subOsc.type = 'square';
+                    subOsc.frequency.value = freq / 2;
+                    
+                    const startTime = now + (index * 0.12);
+                    const stopTime = startTime + 0.2; 
+                    
+                    gain.gain.setValueAtTime(0, startTime);
+                    gain.gain.linearRampToValueAtTime(0.4, startTime + 0.02); 
+                    gain.gain.exponentialRampToValueAtTime(0.001, stopTime); 
+                    
+                    osc.start(startTime);
+                    osc.stop(stopTime);
+                    subOsc.start(startTime);
+                    subOsc.stop(stopTime);
+                });
+            } else {
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                
+                osc1.type = 'sawtooth'; 
+                osc1.frequency.setValueAtTime(1500, now);
+                osc1.frequency.exponentialRampToValueAtTime(40, now + 0.25);
+                
+                gain1.gain.setValueAtTime(0.6, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                
+                osc2.type = 'square'; 
+                osc2.frequency.setValueAtTime(750, now); 
+                osc2.frequency.exponentialRampToValueAtTime(20, now + 0.25);
+                
+                gain2.gain.setValueAtTime(0.6, now);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                
+                osc1.start(now);
+                osc1.stop(now + 0.25);
+                osc2.start(now);
+                osc2.stop(now + 0.25);
+            }
+        }
+
+        function startCircuit() {
+            unlockAudio();
+            btnStart.disabled = true; 
+            circuitDeck = [...ACTIVITIES].sort(() => Math.random() - 0.5);
+            startNewChallenge();
+        }
+
+        function resetWorkout() {
+            unlockAudio();
+            isTransitioning = false;
+            currentTarget = null;
+            circuitDeck = [];
+            currentHits = 0;
+            
+            progBar.style.width = '0%';
+            hudSub.innerText = "MISSION ABORTED";
+            hudMain.innerText = "AWAITING COMMAND";
+            hudMain.style.color = "var(--text-main)";
+            
+            hudMain.style.textShadow = "4px 4px 0px #ff3366";
+            hudBox.style.borderColor = "var(--border-heavy)";
+            
+            Object.values(panels).forEach(p => p.classList.remove('target', 'hit'));
+            btnStart.disabled = false;
+        }
+
+        function startNewChallenge() {
+            isTransitioning = false;
+            currentHits = 0;
+            progBar.style.width = '0%';
+            
+            Object.values(panels).forEach(p => p.classList.remove('target', 'hit'));
+
+            if (circuitDeck.length === 0) {
+                hudSub.innerText = "ORBIT ACHIEVED";
+                hudMain.innerText = "MISSION SUCCESS!";
+                hudMain.style.color = "#33ff77";
+                hudMain.style.textShadow = "4px 4px 0px #000";
+                hudBox.style.borderColor = "#33ff77";
+                currentTarget = null;
+                btnStart.disabled = false; 
+                return;
+            }
+
+            currentTarget = circuitDeck.pop();
+            const currentRound = totalExercises - circuitDeck.length;
+
+            hudSub.innerText = `PHASE ${currentRound} OF ${totalExercises}`;
+            hudMain.innerText = `EXECUTE: ${currentTarget.hitsNeeded} ${currentTarget.name}`;
+            hudMain.style.color = currentTarget.color;
+            hudMain.style.textShadow = `4px 4px 0px #000`;
+            progBar.style.background = currentTarget.color;
+            
+            panels[currentTarget.id].classList.add('target');
+        }
+
+        function handleInput(msg) {
+            if (isTransitioning || !currentTarget) return; 
+            
+            const detectedId = msg.toString().trim();
+            
+            if (detectedId === currentTarget.id) {
+                currentHits++;
+                playBeep(false); 
+
+                const panel = panels[detectedId];
+                panel.classList.add('hit');
+                setTimeout(() => panel.classList.remove('hit'), 150);
+
+                const percent = (currentHits / currentTarget.hitsNeeded) * 100;
+                progBar.style.width = `${percent}%`;
+
+                if (currentHits >= currentTarget.hitsNeeded) {
+                    isTransitioning = true;
+                    playBeep(true); 
+                    
+                    hudMain.innerText = "PHASE COMPLETE";
+                    hudMain.style.color = "#33ff77"; 
+                    hudMain.style.textShadow = "4px 4px 0px #000";
+                    hudBox.style.borderColor = "#33ff77";
+                    
+                    setTimeout(() => {
+                        hudBox.style.borderColor = "var(--border-heavy)";
+                        startNewChallenge();
+                    }, 2000);
+                }
+            }
+        }
+
+        // --- NEW NATIVE WEB SERIAL LOGIC ---
+        let port;
+        let reader;
+
+        async function connectMicroBit() {
+            unlockAudio();
+            try {
+                // Request a port and open a connection.
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 }); // MakeCode default baud rate
+
+                // Update UI visually
+                connDot.style.background = "#33ff77";
+                connText.innerText = "MICRO:BIT COMMS: SECURED";
+                btnConnect.style.display = 'none';
+                btnStart.style.display = 'inline-block';
+                
+                if (!currentTarget) {
+                    btnStart.disabled = false;
+                    hudSub.innerText = "SYSTEMS NOMINAL";
+                    hudMain.innerText = "READY FOR LAUNCH";
+                }
+
+                // Setup the data stream
+                const textDecoder = new TextDecoderStream();
+                const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+                reader = textDecoder.readable.getReader();
+
+                let buffer = "";
+                while (port.readable) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    // Web serial reads in chunks. We need to buffer and split by newlines
+                    buffer += value;
+                    let lines = buffer.split('\n');
+                    buffer = lines.pop(); // keep the last incomplete line in the buffer
+                    
+                    for (let line of lines) {
+                        if (line.trim().length > 0) {
+                            handleInput(line);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Connection failed:", error);
+                connDot.style.background = "#ff3366";
+                connText.innerText = "CONNECTION FAILED";
+            }
+        }
+
+        btnConnect.addEventListener('click', connectMicroBit);
+        btnStart.addEventListener('click', startCircuit);
+        btnReset.addEventListener('click', resetWorkout);
+
+    </script>
+</body>
+</html>

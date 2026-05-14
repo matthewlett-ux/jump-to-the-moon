@@ -43,38 +43,6 @@
             -webkit-text-stroke: 2px #000; 
         }
 
-        .decor-planets {
-            position: fixed;
-            top: -20px;
-            right: 20px;
-            width: 350px;
-            z-index: 0;
-            animation: float-slow 12s ease-in-out infinite;
-            pointer-events: none; 
-        }
-
-        .decor-rocket {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            width: 320px;
-            z-index: 0;
-            animation: float-fast 7s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        @keyframes float-slow {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(20px) rotate(2deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-
-        @keyframes float-fast {
-            0% { transform: translateY(0px) rotate(-5deg); }
-            50% { transform: translateY(-15px) rotate(0deg); }
-            100% { transform: translateY(0px) rotate(-5deg); }
-        }
-
         .dashboard {
             width: 850px;
             background: var(--panel-bg);
@@ -97,6 +65,16 @@
             border: 4px solid var(--border-heavy);
             box-shadow: inset 6px 6px 0px #1a1f33;
             transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .timer-display {
+            font-size: 64px;
+            font-weight: 900;
+            color: #ff3366;
+            margin-bottom: 10px;
+            text-shadow: 4px 4px 0px #000;
+            letter-spacing: 4px;
         }
         
         .hud-subtitle {
@@ -108,7 +86,7 @@
         }
         
         .hud-title {
-            font-size: 48px;
+            font-size: 40px;
             font-weight: 900;
             margin: 0;
             letter-spacing: 1px;
@@ -152,51 +130,18 @@
             text-transform: uppercase;
         }
 
-        /* --- NEW WEB SERIAL CONNECT BUTTON --- */
         .btn-connect {
             background: #ffcc00;
             color: #000;
             border: 3px solid var(--border-heavy);
             box-shadow: 6px 6px 0px #000;
-            animation: pulse 2s infinite;
         }
-
-        .btn-connect:hover {
-            transform: translate(2px, 2px);
-            box-shadow: 4px 4px 0px #000;
-            animation: none;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 6px 6px 0px #000, 0 0 0px #ffcc00; }
-            50% { box-shadow: 6px 6px 0px #000, 0 0 20px #ffcc00; }
-            100% { box-shadow: 6px 6px 0px #000, 0 0 0px #ffcc00; }
-        }
-        /* ----------------------------------- */
 
         .btn-start {
             background: #00e5ff;
             color: #000;
             border: 3px solid var(--border-heavy);
             box-shadow: 6px 6px 0px #000;
-        }
-
-        .btn-start:hover:not(:disabled) {
-            transform: translate(2px, 2px);
-            box-shadow: 4px 4px 0px #000;
-        }
-        
-        .btn-start:active:not(:disabled) {
-            transform: translate(6px, 6px);
-            box-shadow: 0px 0px 0px #000;
-        }
-
-        .btn-start:disabled {
-            background: #2a3454;
-            color: #8b9bb4;
-            border-color: #2a3454;
-            box-shadow: none;
-            cursor: not-allowed;
         }
 
         .btn-reset {
@@ -206,19 +151,22 @@
             box-shadow: 6px 6px 0px #000;
         }
 
-        .btn-reset:hover {
+        .btn:hover:not(:disabled) {
             transform: translate(2px, 2px);
             box-shadow: 4px 4px 0px #000;
         }
-        
-        .btn-reset:active {
-            transform: translate(6px, 6px);
-            box-shadow: 0px 0px 0px #000;
+
+        .btn:disabled {
+            background: #2a3454;
+            color: #8b9bb4;
+            border-color: #2a3454;
+            box-shadow: none;
+            cursor: not-allowed;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
         }
 
@@ -226,10 +174,10 @@
             background: var(--panel-bg);
             border: 3px solid #2a3454;
             border-radius: 8px;
-            padding: 15px 10px;
+            padding: 20px 10px; 
             text-align: center;
             font-weight: 900;
-            font-size: 14px;
+            font-size: 16px; 
             color: #8b9bb4;
             transition: all 0.1s ease;
             display: flex;
@@ -240,7 +188,7 @@
         }
 
         .panel-id {
-            font-size: 24px;
+            font-size: 28px; 
             color: var(--theme-color);
             opacity: 0.5;
         }
@@ -288,13 +236,11 @@
 </head>
 <body>
 
-    <img src="assets/planets.png" class="decor-planets" alt="Space Planets">
-    <img src="assets/rocket.png" class="decor-rocket" alt="Astronaut on Rocket">
-
     <h1 class="page-title">JUMP TO THE MOON</h1>
 
     <div class="dashboard">
         <div class="hud" id="hud">
+            <div class="timer-display" id="timer">02:00</div>
             <div class="hud-subtitle" id="hud-sub">MISSION TELEMETRY: OFFLINE</div>
             <div class="hud-title" id="hud-main">AWAITING CONNECTION</div>
             <div class="progress-container">
@@ -303,7 +249,6 @@
         </div>
 
         <div class="controls">
-            <!-- NEW CONNECT BUTTON -->
             <button class="btn btn-connect" id="btn-connect">CONNECT HARDWARE</button>
             <button class="btn btn-start" id="btn-start" style="display:none;" disabled>INITIATE LAUNCH</button>
             <button class="btn btn-reset" id="btn-reset">ABORT</button>
@@ -313,20 +258,18 @@
 
         <div class="footer">
             <div><span class="status-dot" id="conn-dot"></span><span id="conn-text">MICRO:BIT COMMS: DISCONNECTED</span></div>
-            <div>ASTRONAUT FITNESS AI V2.0</div>
+            <div>ASTRONAUT FITNESS AI V3.0</div>
         </div>
     </div>
 
     <script>
+        // Updated to the 4 specific exercises. 
+        // hitsNeeded controls how many reps they must do before the AI picks a new random exercise.
         const ACTIVITIES = [
-            { id: "1", name: "Star Jumps",       color: "#ffcc00", hitsNeeded: 10 }, 
-            { id: "2", name: "Rocket Sprints",   color: "#33ff77", hitsNeeded: 20 }, 
-            { id: "3", name: "Lunar Jogs",       color: "#00e5ff", hitsNeeded: 15 }, 
-            { id: "4", name: "Anti-Grav Push",   color: "#3b82f6", hitsNeeded: 8 },  
-            { id: "5", name: "Solar Sit Ups",    color: "#ff9900", hitsNeeded: 8 },  
-            { id: "6", name: "Cryo-Rest",        color: "#9933ff", hitsNeeded: 5 },  
-            { id: "7", name: "Asteroid Squats",  color: "#ff3366", hitsNeeded: 10 }, 
-            { id: "8", name: "Launchpad Lunges", color: "#f8fafc", hitsNeeded: 10 }  
+            { id: "1", name: "Star Jumps",       color: "#ffcc00", hitsNeeded: 8 }, 
+            { id: "2", name: "Rocket Sprints",   color: "#33ff77", hitsNeeded: 12 }, 
+            { id: "3", name: "Cryo-Rest",        color: "#00e5ff", hitsNeeded: 4 },  
+            { id: "4", name: "Asteroid Squats",  color: "#ff3366", hitsNeeded: 8 } 
         ];
 
         const grid = document.getElementById('panel-grid');
@@ -334,6 +277,7 @@
         const hudSub = document.getElementById('hud-sub');
         const progBar = document.getElementById('prog-bar');
         const hudBox = document.getElementById('hud');
+        const timerDisplay = document.getElementById('timer');
         
         const btnConnect = document.getElementById('btn-connect');
         const btnStart = document.getElementById('btn-start');
@@ -345,11 +289,15 @@
         const panels = {};
         let currentTarget = null;
         let currentHits = 0;
+        let totalScore = 0;
         let isTransitioning = false; 
         
-        let circuitDeck = [];
-        const totalExercises = ACTIVITIES.length;
+        // Timer Variables
+        let timeLeft = 120; // 2 minutes in seconds
+        let timerInterval = null;
+        let isWorkoutActive = false;
 
+        // Initialize panels
         ACTIVITIES.forEach(act => {
             const div = document.createElement('div');
             div.className = 'panel';
@@ -359,6 +307,7 @@
             panels[act.id] = div;
         });
 
+        // --- Audio Setup (Kept from previous version) ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
         function unlockAudio() {
@@ -381,11 +330,6 @@
                     osc.type = 'square'; 
                     osc.frequency.value = freq;
                     
-                    const subOsc = audioCtx.createOscillator();
-                    subOsc.connect(gain);
-                    subOsc.type = 'square';
-                    subOsc.frequency.value = freq / 2;
-                    
                     const startTime = now + (index * 0.12);
                     const stopTime = startTime + 0.2; 
                     
@@ -395,65 +339,100 @@
                     
                     osc.start(startTime);
                     osc.stop(stopTime);
-                    subOsc.start(startTime);
-                    subOsc.stop(stopTime);
                 });
             } else {
-                const osc1 = audioCtx.createOscillator();
-                const gain1 = audioCtx.createGain();
-                osc1.connect(gain1);
-                gain1.connect(audioCtx.destination);
-                
-                osc1.type = 'sawtooth'; 
-                osc1.frequency.setValueAtTime(1500, now);
-                osc1.frequency.exponentialRampToValueAtTime(40, now + 0.25);
-                
-                gain1.gain.setValueAtTime(0.6, now);
-                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-                
-                const osc2 = audioCtx.createOscillator();
-                const gain2 = audioCtx.createGain();
-                osc2.connect(gain2);
-                gain2.connect(audioCtx.destination);
-                
-                osc2.type = 'square'; 
-                osc2.frequency.setValueAtTime(750, now); 
-                osc2.frequency.exponentialRampToValueAtTime(20, now + 0.25);
-                
-                gain2.gain.setValueAtTime(0.6, now);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-                
-                osc1.start(now);
-                osc1.stop(now + 0.25);
-                osc2.start(now);
-                osc2.stop(now + 0.25);
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth'; 
+                osc.frequency.setValueAtTime(1500, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
             }
         }
 
+        // --- Timer Functions ---
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            timerDisplay.innerText = formatTime(timeLeft);
+            
+            if (timeLeft <= 30) {
+                timerDisplay.style.color = "#ffcc00"; // Yellow warning
+            }
+            if (timeLeft <= 10) {
+                timerDisplay.style.color = "#ff3366"; // Red warning
+            }
+
+            if (timeLeft <= 0) {
+                endWorkout();
+            }
+        }
+
+        // --- Game Logic ---
         function startCircuit() {
             unlockAudio();
             btnStart.disabled = true; 
-            circuitDeck = [...ACTIVITIES].sort(() => Math.random() - 0.5);
+            isWorkoutActive = true;
+            totalScore = 0;
+            timeLeft = 120;
+            timerDisplay.style.color = "#00e5ff";
+            timerDisplay.innerText = formatTime(timeLeft);
+            
+            timerInterval = setInterval(updateTimer, 1000);
             startNewChallenge();
+        }
+
+        function endWorkout() {
+            clearInterval(timerInterval);
+            isWorkoutActive = false;
+            isTransitioning = true;
+            currentTarget = null;
+            
+            playBeep(true);
+            Object.values(panels).forEach(p => p.classList.remove('target', 'hit'));
+            
+            hudSub.innerText = "TIME'S UP! MISSION COMPLETE";
+            hudMain.innerText = `TOTAL REPS: ${totalScore}`;
+            hudMain.style.color = "#33ff77";
+            hudBox.style.borderColor = "#33ff77";
+            progBar.style.width = '100%';
+            progBar.style.background = "#33ff77";
+            
+            btnStart.innerText = "LAUNCH AGAIN";
+            btnStart.disabled = false;
         }
 
         function resetWorkout() {
             unlockAudio();
+            clearInterval(timerInterval);
+            isWorkoutActive = false;
             isTransitioning = false;
             currentTarget = null;
-            circuitDeck = [];
-            currentHits = 0;
+            totalScore = 0;
+            timeLeft = 120;
             
+            timerDisplay.innerText = "02:00";
+            timerDisplay.style.color = "#ff3366";
             progBar.style.width = '0%';
+            
             hudSub.innerText = "MISSION ABORTED";
             hudMain.innerText = "AWAITING COMMAND";
             hudMain.style.color = "var(--text-main)";
-            
             hudMain.style.textShadow = "4px 4px 0px #ff3366";
             hudBox.style.borderColor = "var(--border-heavy)";
             
             Object.values(panels).forEach(p => p.classList.remove('target', 'hit'));
-            btnStart.disabled = false;
+            if (port) btnStart.disabled = false;
         }
 
         function startNewChallenge() {
@@ -463,22 +442,16 @@
             
             Object.values(panels).forEach(p => p.classList.remove('target', 'hit'));
 
-            if (circuitDeck.length === 0) {
-                hudSub.innerText = "ORBIT ACHIEVED";
-                hudMain.innerText = "MISSION SUCCESS!";
-                hudMain.style.color = "#33ff77";
-                hudMain.style.textShadow = "4px 4px 0px #000";
-                hudBox.style.borderColor = "#33ff77";
-                currentTarget = null;
-                btnStart.disabled = false; 
-                return;
-            }
+            // Pick a random exercise, ensuring it's not the exact same one twice in a row
+            let newTarget;
+            do {
+                newTarget = ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)];
+            } while (newTarget === currentTarget && ACTIVITIES.length > 1);
+            
+            currentTarget = newTarget;
 
-            currentTarget = circuitDeck.pop();
-            const currentRound = totalExercises - circuitDeck.length;
-
-            hudSub.innerText = `PHASE ${currentRound} OF ${totalExercises}`;
-            hudMain.innerText = `EXECUTE: ${currentTarget.hitsNeeded} ${currentTarget.name}`;
+            hudSub.innerText = `SCORE: ${totalScore} | ACTIVE EXERCISE`;
+            hudMain.innerText = `EXECUTE: ${currentTarget.name}`;
             hudMain.style.color = currentTarget.color;
             hudMain.style.textShadow = `4px 4px 0px #000`;
             progBar.style.background = currentTarget.color;
@@ -487,12 +460,13 @@
         }
 
         function handleInput(msg) {
-            if (isTransitioning || !currentTarget) return; 
+            if (!isWorkoutActive || isTransitioning || !currentTarget) return; 
             
             const detectedId = msg.toString().trim();
             
             if (detectedId === currentTarget.id) {
                 currentHits++;
+                totalScore++; 
                 playBeep(false); 
 
                 const panel = panels[detectedId];
@@ -501,6 +475,7 @@
 
                 const percent = (currentHits / currentTarget.hitsNeeded) * 100;
                 progBar.style.width = `${percent}%`;
+                hudSub.innerText = `SCORE: ${totalScore} | ACTIVE EXERCISE`;
 
                 if (currentHits >= currentTarget.hitsNeeded) {
                     isTransitioning = true;
@@ -512,37 +487,36 @@
                     hudBox.style.borderColor = "#33ff77";
                     
                     setTimeout(() => {
-                        hudBox.style.borderColor = "var(--border-heavy)";
-                        startNewChallenge();
-                    }, 2000);
+                        if (isWorkoutActive) {
+                            hudBox.style.borderColor = "var(--border-heavy)";
+                            startNewChallenge();
+                        }
+                    }, 1000); // Short delay before picking the next random exercise
                 }
             }
         }
 
-        // --- NEW NATIVE WEB SERIAL LOGIC ---
+        // --- Serial Connection (Kept from previous version) ---
         let port;
         let reader;
 
         async function connectMicroBit() {
             unlockAudio();
             try {
-                // Request a port and open a connection.
                 port = await navigator.serial.requestPort();
-                await port.open({ baudRate: 115200 }); // MakeCode default baud rate
+                await port.open({ baudRate: 115200 });
 
-                // Update UI visually
                 connDot.style.background = "#33ff77";
                 connText.innerText = "MICRO:BIT COMMS: SECURED";
                 btnConnect.style.display = 'none';
                 btnStart.style.display = 'inline-block';
                 
-                if (!currentTarget) {
+                if (!isWorkoutActive) {
                     btnStart.disabled = false;
                     hudSub.innerText = "SYSTEMS NOMINAL";
                     hudMain.innerText = "READY FOR LAUNCH";
                 }
 
-                // Setup the data stream
                 const textDecoder = new TextDecoderStream();
                 const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
                 reader = textDecoder.readable.getReader();
@@ -552,10 +526,9 @@
                     const { value, done } = await reader.read();
                     if (done) break;
                     
-                    // Web serial reads in chunks. We need to buffer and split by newlines
                     buffer += value;
                     let lines = buffer.split('\n');
-                    buffer = lines.pop(); // keep the last incomplete line in the buffer
+                    buffer = lines.pop(); 
                     
                     for (let line of lines) {
                         if (line.trim().length > 0) {
